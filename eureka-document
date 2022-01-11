@@ -1,0 +1,113 @@
+# eureka-server
+Eureka naming server is an application that holds information about all client service applications. Each microservice registers itself with the Eureka naming server.
+The naming server registers the client services with their port numbers and IP addresses.It runs on the default port 8761
+
+->Setting up Eureka naming server
+Step 1: Open Spring Initializr https://start.spring.io.
+Step 2: Provide the Artifact Id. We have provided netflix-eureka-naming-server.
+Step 3: Add the following dependencies: Eureka Server, Config Client, Actuator, and DevTools.
+Step 4: Open the NetflixEurekaNamingServerApplication.java file and enable Eureka naming server by using an annotation @EnableEurekaServer.
+
+import org.springframework.boot.autoconfigure.SpringBootApplication;  
+import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;  
+@SpringBootApplication  
+@EnableEurekaServer  
+public class NetflixEurekaNamingServerApplication   
+{  
+public static void main(String[] args) {  
+SpringApplication.run(NetflixEurekaNamingServerApplication.class, args);  
+}  
+}  
+
+Step 5: Open the application.properties file and configure the application name, port, and eureka server.
+
+spring.application.name=netflix-eureka-naming-server  
+server.port=8761  
+eureka.client.register-with-eureka=false  
+eureka.client.fetch-registry=false  
+
+Step 6: Run the NetflixEurekaNamingServerApplication.java file as Java Application.
+
+Step 7: Open the browser and type the URL http://localhost:8761. It shows the Eureka server UI.
+
+----------------------------------------------------------------------------------------------------------------------------------------------
+->Connecting Microservices to Eureka naming server
+*connect the currency-conversion-service and currency-exchange-service to the Eureka naming server.
+
+Step 1: Select the currency-conversion-service project.
+Step 2: Open the pom.xml file and add the eureka-client dependency.
+<dependency>  
+<groupId>org.springframework.cloud</groupId>  
+<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>  
+</dependency>  
+
+Step 3: Open CurrencyConversionServiceApplication.java file and enable discovery client by using the annotation @EnableDiscoveryClient.
+package com.thbs.bt;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+@SpringBootApplication
+@EnableFeignClients("com.thbs.bt") 
+@EnableDiscoveryClient  
+public class CurrencyConversionServiceApplication 
+{
+public static void main(String[] args) 
+{
+SpringApplication.run(CurrencyConversionServiceApplication.class, args);
+}
+}
+Step 4: Open the application.properties file and configure the URL for the Eureka naming server.
+eureka.client.service-url.default-zone=http://localhost:8761/eureka 
+
+Step 5: Run the CurrencyConversionServiceApplication.java file.
+step6:Open the browser and refresh the Eureka server page. It shows the instances of registered microservices.ie localhost:8761
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+Step 1: Select the currency-exchange-service project.
+
+Step 2: Open the pom.xml file and add the eureka-client dependency.
+
+<dependency>  
+<groupId>org.springframework.cloud</groupId>  
+<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>  
+</dependency>  
+Step 3: Open CurrencyExchangeServiceApplication.java file and enable the discovery client by using the annotation @EnableDiscoveryClient.
+package com.thbs.bt;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+@SpringBootApplication
+@EnableDiscoveryClient
+public class CurrencyExchangeServiceApplication 
+{
+public static void main(String[] args) 
+{
+SpringApplication.run(CurrencyExchangeServiceApplication.class, args);
+}
+}
+
+Step 4: Open the application.properties file and configure the URL for Eureka naming server.
+eureka.client.service-url.default-zone=http://localhost:8761/eureka  
+Step 5: Run the two instances of CurrencyExchangeServiceApplication.java. First instance on port 8000 and the second instance on port 8001.
+
+Step 6: Open the browser and refresh the Eureka server. It shows the registered microservice.
+---------------------------------------------------------------------------------------------------------------------------------------------
+1.spring.application.name=currency-exchange-service
+server.port=8000
+Get:http://localhost:8000/currency-exchange/from/USD/to/INR
+Response:{"id":10001,"from":"USD","to":"INR","conversionMultiple":65.00,"port":8000}
+
+2.spring.application.name=currency-conversion-service
+server.port=8100
+Get:http://localhost:8100/currency-converter-feign/from/USD/to/INR/quantity/1000
+Response:{"id":10001,"from":"USD","to":"INR","quantity":1000,"totalCalculatedAmount":65000.00,"port":8000,"conversionMultiple":65.00}
+
+3.spring.application.name=netflix-eureka-naming-server
+server.port=8761
+Get:http://localhost:8761/
+
+
+
+ 
+
